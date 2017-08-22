@@ -13,7 +13,14 @@ import time
 import datetime
 import calendar
 
-discord.opus.load_opus(self.opus_library)
+
+import opuslib
+import opuslib.api
+import opuslib.api.encoder
+import opuslib.api.decoder
+
+
+discord.opus.load_opus()
 
 
 des = 'Le meilleur des bots de test dans ton jardin'
