@@ -6,3 +6,4 @@ whitenoise==3.3.0
 discord
 pynacl
 youtube_dl
+ffmpeg-python
