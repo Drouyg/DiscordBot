@@ -40,7 +40,7 @@ randomTalkList = [
      "Ping ?"
     ],
     ['bot',
-     'Oui, je suis un bot',
+     'Oui, je suis un bot.',
      "Suis-je un bot ? Ou une suite de signaux électriques passants à travers le monde à toute vitesse pour écrire des phrases déjà écrites ?",
      "Un bot, et bientôt bien plus."
     ],
@@ -50,6 +50,7 @@ randomTalkList = [
     ],
     ['ah',
      "https://giphy.com/gifs/geekinc-ah-geek-inc-3o7btW7VDxqrhJEnqE",
+     'Je dirais même plus: "AH" !',
      "https://giphy.com/gifs/nba-interesting-xUPGcmrdRkCaZ5qZ2M"
     ],
     ['salade',
@@ -68,7 +69,12 @@ randomTalkList = [
      'Ouais, cassez-vous. !',
      'À plus dans l\'bus !'
     ],
-    ['xD',
+    ['bonjour',
+     'Hello !.',
+     'Salutation !',
+     'BOOOOOOOOOOOOONJOUR !!!'
+    ],
+    ['xd',
      'C\'est drôle ?',
      'On se marre bien ?',
      'XDDDDD',
@@ -202,34 +208,38 @@ async def on_message(message):
 
 
     #MUSIC BOT
-    """
-    if msg == '!join':
 
-        try:
-            channel = message.author.voice.voice_channel
-            await client.join_voice_channel(channel)
-        except discord.errors.InvalidArgument:
-            await client.send_message(message.channel, "Voice channel non trouvé.")
-        #except Exception as error:
-        #    await client.send_message(message.channel, "Erreur: ```{error}```".format(error=error))
+    if msg.startswith('!join'):
 
-    if msg == '!quit':
-        try:
+        if message.author.voice.voice_channel != None:
+            if client.is_voice_connected(message.server):
+                if message.author.voice.voice_channel == client.voice_client_in(message.server).channel:
+                    await client.send_message(message.channel, 'Je suis déjà là, <@' + str(message.author.id) + '>.')
+                else:
+                    await client.voice_client_in(message.server).move_to(message.author.voice.voice_channel)
+                    await client.send_message(message.channel, 'Je me bouge, <@' + str(message.author.id) + '> !')
+            else:
+                await client.join_voice_channel(message.author.voice.voice_channel)
+                await client.send_message(message.channel, 'J\'arrive pour toi, <@' + str(message.author.id) + '> :heart: !')
+        else:
+            await client.send_message(message.channel, '<@' + str(message.author.id) + '>, installe-toi dans un salon vocal et rappelle-moi !')
+
+
+    if msg.startswith('!quit'):
+        if client.is_voice_connected(message.server):
             voice_client = client.voice_client_in(message.server)
             await voice_client.disconnect()
-        except AttributeError:
-            await client.send_message(message.channel, "Le bot n'est pas connecté.")
-        #except Exception as error:
-        #    await client.send_message(message.channel, "Erreur: ```{error}```".format(error=error))
+            await client.send_message(message.channel, 'À une prochaine, <@' + str(message.author.id) + '> !')
+        else:
+            await client.send_message(message.channel, "Alors non, je ne peux pas partir avant d'entrer.")
 
 
 
-    if message.content.startswith('!play '):
-        try:
+    if msg.startswith('!play '):
+        if len(msg)>6:
             yt_url = message.content[6:]
             if client.is_voice_connected(message.server):
                 try:
-                    print('1')
                     voice = client.voice_client_in(message.server)
                     players[message.server.id].stop()
                     player = await voice.create_ytdl_player(yt_url, before_options=" -reconnect 1 -reconnect_streamed 1"
@@ -241,7 +251,7 @@ async def on_message(message):
 
             if not client.is_voice_connected(message.server):
                 try:
-                    print('h')
+                    await client.send_message(message.channel, 'Je vais monter le son chez <@'+str(message.author.id)+'> !')
                     channel = message.author.voice.voice_channel
                     voice = await client.join_voice_channel(channel)
                     player = await voice.create_ytdl_player(yt_url, before_options=" -reconnect 1 -reconnect_streamed 1"
@@ -250,24 +260,25 @@ async def on_message(message):
                     player.start()
                 except Exception as error:
                     await client.send_message(message.channel, "Error: [{error}]".format(error=error))
-        except Exception as e:
-            await client.send_message(message.channel, "Error: [{error}]".format(error=e))
+        else:
+            await client.send_message(message.channel, "Il me faut un lien Youtube.")
 
 
 
-    if message.content.startswith('!pause'):
+
+    if msg.startswith('!pause'):
         try:
             players[message.server.id].pause()
         except Exception as error:
             await client.send_message(message.channel, "Error: [{error}]".format(error=error))
-            
-    if message.content.startswith('!resume'):
+
+    if msg.startswith('!resume'):
         try:
             players[message.server.id].resume()
         except Exception as error:
             await client.send_message(message.channel, "Error: [{error}]".format(error=error))
 
-    """
+
 
 
 
