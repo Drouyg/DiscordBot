@@ -8,3 +8,4 @@ pynacl
 youtube_dl
 ffmpeg-python
 opuslib
+opus
