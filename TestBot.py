@@ -13,6 +13,8 @@ import time
 import datetime
 import calendar
 
+discord.opus.load_opus().
+
 
 des = 'Le meilleur des bots de test dans ton jardin'
 
