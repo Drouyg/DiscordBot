@@ -202,7 +202,7 @@ async def on_message(message):
 
 
     #MUSIC BOT
-
+'''
     if msg == '!join':
 
         try:
@@ -267,7 +267,7 @@ async def on_message(message):
         except Exception as error:
             await client.send_message(message.channel, "Error: [{error}]".format(error=error))
 
-
+'''
 
 
 
