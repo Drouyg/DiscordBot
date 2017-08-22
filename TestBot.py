@@ -306,11 +306,13 @@ async def on_message(message):
 
 
     if random.randint(1, 50) == 1:
-        rand = random.randint(1, 3)
+        rand = random.randint(1, 4)
         if rand == 1:
             await client.send_message(message.channel, 'Yeah, Whatever.')
         elif rand == 2:
             await client.send_message(message.channel, "Qui s'en fout ? \o/")
+        elif rand == 3:
+            await client.send_message(message.channel, "https://giphy.com/gifs/hLVK6yBZcyPVm")
         else:
             await client.send_message(message.channel, "Comme disait mon père : on s'en bat les cou*lles, frère.")
 
