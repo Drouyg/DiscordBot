@@ -60,7 +60,7 @@ randomTalkList = [
      "Moi aussi, j'aime bien la musique.",
      "De la musique ? Où ça ?"
     ],
-    ['ah',
+    ['ah ',
      "https://giphy.com/gifs/geekinc-ah-geek-inc-3o7btW7VDxqrhJEnqE",
      'Je dirais même plus: "AH" !',
      "https://giphy.com/gifs/nba-interesting-xUPGcmrdRkCaZ5qZ2M"
@@ -252,6 +252,7 @@ async def on_message(message):
             yt_url = message.content[6:]
             if client.is_voice_connected(message.server):
                 try:
+                    await client.send_message(message.channel, '<@'+str(message.author.id)+'> lance le son !')
                     voice = client.voice_client_in(message.server)
                     players[message.server.id].stop()
                     player = await voice.create_ytdl_player(yt_url, before_options=" -reconnect 1 -reconnect_streamed 1"
@@ -262,16 +263,7 @@ async def on_message(message):
                     await client.send_message(message.server, "Error: [{error}]".format(error=e))
 
             if not client.is_voice_connected(message.server):
-                try:
-                    await client.send_message(message.channel, 'Je vais monter le son chez <@'+str(message.author.id)+'> !')
-                    channel = message.author.voice.voice_channel
-                    voice = await client.join_voice_channel(channel)
-                    player = await voice.create_ytdl_player(yt_url, before_options=" -reconnect 1 -reconnect_streamed 1"
-                                                                                   " -reconnect_delay_max 5")
-                    players[message.server.id] = player
-                    player.start()
-                except Exception as error:
-                    await client.send_message(message.channel, "Error: [{error}]".format(error=error))
+                await client.send_message(message.channel, '<@'+str(message.author.id)+'>, fais "!join" pour m\'appeler !')
         else:
             await client.send_message(message.channel, "Il me faut un lien Youtube.")
 
