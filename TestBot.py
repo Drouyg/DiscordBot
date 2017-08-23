@@ -254,7 +254,7 @@ async def on_message(message):
                 try:
                     await client.send_message(message.channel, '<@'+str(message.author.id)+'> lance le son !')
                     voice = client.voice_client_in(message.server)
-                    if players[message.server.id].is_live() :
+                    if players[message.server.id].is_playing() :
                         players[message.server.id].stop()
                     player = await voice.create_ytdl_player(yt_url, before_options=" -reconnect 1 -reconnect_streamed 1"
                                                                                    " -reconnect_delay_max 5")
@@ -270,7 +270,7 @@ async def on_message(message):
 
 
     if msg.startswith('!stop'):
-        if players[message.server.id].is_live():
+        if players[message.server.id].is_playing():
             players[message.server.id].stop()
 
 
