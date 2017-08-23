@@ -34,6 +34,7 @@ client = commands.Bot(description=des, command_prefix=prefix)
 players = {}
 
 
+
 #RandomTalk
 
 randomTalkList = [
