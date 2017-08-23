@@ -22,7 +22,7 @@ import opuslib.api.decoder
 
 
 
-discord.opus.load_opus()
+discord.opus.load_opus('opus-1.2.1')
 
 
 des = 'Le meilleur des bots de test dans ton jardin'
