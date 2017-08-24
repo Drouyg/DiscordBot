@@ -33,6 +33,8 @@ client = commands.Bot(description=des, command_prefix=prefix)
 
 
 players = {}
+nextSong = []
+nextPaused = [False]
 
 
 
@@ -59,11 +61,6 @@ randomTalkList = [
     ['musique',
      "Moi aussi, j'aime bien la musique.",
      "De la musique ? Où ça ?"
-    ],
-    ['ah ',
-     "https://giphy.com/gifs/geekinc-ah-geek-inc-3o7btW7VDxqrhJEnqE",
-     'Je dirais même plus: "AH" !',
-     "https://giphy.com/gifs/nba-interesting-xUPGcmrdRkCaZ5qZ2M"
     ],
     ['salade',
      'Bordel, ça fait tellement longtemps que j\'attends que quelqu\'un dise "salade". Je suis super content !'
@@ -113,8 +110,83 @@ randomTalkList = [
      'Stop parler Esperanto, ça ne sert à rien.',
      'En vrai l\'esperanto c\'est marrant.',
      'À quand un bot esperanto ?'
-     ]
+    ]
 ]
+
+
+
+#Jukebox
+
+jukebox = [
+    ['I See stars - Treehouse',
+     'iss',
+     "https://www.youtube.com/watch?v=-Do461IqoSc",
+     "https://www.youtube.com/watch?v=Vgevhi2pCIE",
+     "https://www.youtube.com/watch?v=fW6BrjUvt8Y",
+     "https://www.youtube.com/watch?v=f0y9e_X0UaI",
+     "https://www.youtube.com/watch?v=600kX4ZBzyE",
+     "https://www.youtube.com/watch?v=rh5p2GwLvvQ",
+     "https://www.youtube.com/watch?v=ObbvHnNDqCY",
+     "https://www.youtube.com/watch?v=45VJ3vpkNN0",
+     "https://www.youtube.com/watch?v=iphPkgm5f1A",
+     "https://www.youtube.com/watch?v=lwblmiwWBas",
+     "https://www.youtube.com/watch?v=ceukqHx8opY",
+     "https://www.youtube.com/watch?v=AmicHgzvGfs"
+     ],
+
+    ['Post Rock',
+     'pr',
+     "https://www.youtube.com/watch?v=hATifcVr_1U",
+     "https://www.youtube.com/watch?v=fopOFoJ3fVs",
+     "https://www.youtube.com/watch?v=gHyZPB3GmOk",
+     "https://www.youtube.com/watch?v=l5-gja10qkw",
+     "https://www.youtube.com/watch?v=FrzGOTT8MEM",
+     "https://www.youtube.com/watch?v=iC_SvgjAn5I",
+     "https://www.youtube.com/watch?v=uxzxIIpGyQc"
+     ],
+
+    ['J-Rock / J-Pop',
+     'jrock',
+     "https://www.youtube.com/watch?v=bV4vcr8E4HU",
+     "https://www.youtube.com/watch?v=Q1Xzw12qMgk",
+     "https://www.youtube.com/watch?v=1kutzdLY5Dc",
+     "https://www.youtube.com/watch?v=6eHuPYOJ2ZE",
+     "https://www.youtube.com/watch?v=GJ4yehnerHQ",
+     "https://www.youtube.com/watch?v=xGbxsiBZGPI",
+     "https://www.youtube.com/watch?v=rh517TMtVbo",
+     "https://www.youtube.com/watch?v=tcBBNB5JTOQ",
+     "https://www.youtube.com/watch?v=vYV-XJdzupY",
+     "https://www.youtube.com/watch?v=K_xTet06SUo",
+     "https://www.youtube.com/watch?v=UjZqcDYbvAE",
+     "https://www.youtube.com/watch?v=6YZlFdTIdzM",
+     "https://www.youtube.com/watch?v=2e0Cdi_TLY8",
+     "https://www.youtube.com/watch?v=gN24W_psMpE",
+     "https://www.youtube.com/watch?v=cZpmj1assiQ",
+     "https://www.youtube.com/watch?v=BwXgMzoCnxU",
+     "https://www.youtube.com/watch?v=JaPGbJk4Tcc",
+     "https://www.youtube.com/watch?v=Gb6l9zH5ZK4"
+     ],
+
+    ['Electro-swing, wut?',
+     'wtf',
+     "https://www.youtube.com/watch?v=UbQgXeY_zi4",
+     "https://www.youtube.com/watch?v=lX44CAz-JhU",
+     "https://www.youtube.com/watch?v=FHccClTAdzc",
+     "https://www.youtube.com/watch?v=fBGSJ3sbivI",
+     "https://www.youtube.com/watch?v=6rjN36OKpuM",
+     "https://www.youtube.com/watch?v=ZeBrnuQxEsQ",
+     "https://www.youtube.com/watch?v=UPjvhk7I7eQ",
+     "https://www.youtube.com/watch?v=CqaAs_3azSs",
+     "https://www.youtube.com/watch?v=kfoJUeyMsOE",
+     "https://www.youtube.com/watch?v=52Gg9CqhbP8",
+     "https://www.youtube.com/watch?v=YgGzAKP_HuM",
+     "https://www.youtube.com/watch?v=HyHNuVaZJ-k"
+     ]
+
+    ]
+
+
+
 
 
 
@@ -133,6 +205,7 @@ def randomTalk(message, word, textList):
 @client.event
 async def on_ready():
     print('It works')
+    client.loop.create_task(timer())
 
 
 """
@@ -165,7 +238,7 @@ async def slap(ctx,args):
 
 @client.event
 async def on_message(message):
-    if message.author == client.user:
+    if message.author == client.user and not message.content.startswith('!'):
         return
 
     msg = message.content.lower()
@@ -186,6 +259,8 @@ async def on_message(message):
         else:
             await client.send_message(message.channel, '<@'+str(message.author.id)+'> slapped' + msg[4:])
 
+
+
     if msg.startswith('quoi ?'):
         rand = random.randint(1,5)
         if rand == 1:
@@ -198,6 +273,15 @@ async def on_message(message):
             await client.send_message(message.channel, 'Comment ?')
         else:
             await client.send_message(message.channel, 'https://giphy.com/gifs/reaction-learning-charlottesville-pfAKetMYidBjq')
+
+    if msg.startswith('ah'):
+        rand = random.randint(1,3)
+        if rand == 1:
+            await client.send_message(message.channel, "https://giphy.com/gifs/geekinc-ah-geek-inc-3o7btW7VDxqrhJEnqE")
+        elif rand == 2:
+            await client.send_message(message.channel, 'Je dirais même plus: "AH" !')
+        else:
+            await client.send_message(message.channel, "https://giphy.com/gifs/nba-interesting-xUPGcmrdRkCaZ5qZ2M")
 
     if 'temps' in msg:
         today = datetime.date.today().isoweekday()
@@ -218,8 +302,52 @@ async def on_message(message):
 
 
 
+    #JUKEBOX
+
+
+    if msg.startswith('!jukebox'):
+        if len(msg)<9:
+            await client.send_message(message.channel, '*<@'+str(message.author.id)+'> open the jukebox.*')
+            await client.send_message(message.channel, 'https://giphy.com/gifs/ruby-XxkkxrnylVG7u')
+            for i in range(len(jukebox)):
+                await client.send_message(message.channel, '**-----------'+str(i+1)+'-----------**')
+                await client.send_message(message.channel, '**Name : ' + jukebox[i][0] + '**')
+                await client.send_message(message.channel, '*Id : ' + jukebox[i][1] + '*')
+                await client.send_message(message.channel, '*Nb of song : ' + str(len(jukebox[i])-2) + '*')
+                await client.send_message(message.channel, '**------------------------**')
+            await client.send_message(message.channel, 'Use "!jukebox *id*" to place a disk.')
+
+        else:
+            for e in jukebox:
+                if msg[9:] == e[1]:
+                    await client.send_message(message.channel, "!play " + e[2])
+                    await asyncio.sleep(1)
+                    for i in range(3, len(e)):
+                        await client.send_message(message.channel, "!next " + e[i])
+
+
+
+
 
     #MUSIC BOT
+
+
+
+    if msg.startswith('!help'):
+        await client.send_message(message.channel, 'Besoin d\'aide ? C\'est simple, c\'est du Franglais !')
+        await client.send_message(message.channel, '**"!join"** - Dans ton salon vocal, le bot se joindra.')
+        await client.send_message(message.channel, '**"!quit"** - Dans l\'espace, le bot repartira.')
+        await client.send_message(message.channel, '**"!play *url*"** - La vidéo youtube, le bot lira.')
+        await client.send_message(message.channel, '**"!stop"** - La vidéo youtube, le bot arrêtera. À la suivante, il passera.')
+        await client.send_message(message.channel, '**"!pause"** - La vidéo youtube, le bot mettra en pause.')
+        await client.send_message(message.channel, '**"!resume"** - La vidéo youtube, le bot reprendra.')
+        await client.send_message(message.channel, '**"!now"** - Le titre de la vidéo youtube, le bot affichera.')
+        await client.send_message(message.channel, '**"!next *url*"** - La vidéo youtube à la liste de lecture, le bot ajoutera.')
+        await client.send_message(message.channel, '**"!show"** - Les prochaines vidéos youtube dans la liste de lecture, le bot affichera.')
+        await client.send_message(message.channel, '**"!jukebox"** - une liste de vidéos présélectionnées, le bot affichera.')
+        await client.send_message(message.channel, '**"!jukebox *id*"** - une liste de vidéos présélectionnées, le bot lancera.')
+
+
 
     if msg.startswith('!join'):
 
@@ -238,6 +366,8 @@ async def on_message(message):
 
 
     if msg.startswith('!quit'):
+        nextPaused[0] = False
+        nextSong.clear()
         if client.is_voice_connected(message.server):
             voice_client = client.voice_client_in(message.server)
             await voice_client.disconnect()
@@ -248,23 +378,29 @@ async def on_message(message):
 
 
     if msg.startswith('!play '):
+        nextPaused[0] = False
         if len(msg)>6:
             yt_url = message.content[6:]
             if client.is_voice_connected(message.server):
+
+
+                if message.server.id in players:
+                    if players[message.server.id].is_playing() :
+                        await client.send_message(message.channel, "Stopping...")
+                        players[message.server.id].stop()
+
+
+                await client.send_message(message.channel, 'Chargement...')
+                voice = client.voice_client_in(message.server)
                 try:
-                    await client.send_message(message.channel, '<@'+str(message.author.id)+'> lance le son !')
-                    voice = client.voice_client_in(message.server)
-                    try :
-                        if players[message.server.id].is_playing() :
-                            players[message.server.id].stop()
-                    except Exception as ee:
-                        await client.send_message(message.server, "Error: [{error}]".format(error=ee))
-                    player = await voice.create_ytdl_player(yt_url, before_options=" -reconnect 1 -reconnect_streamed 1"
-                                                                                   " -reconnect_delay_max 5")
+                    player = await voice.create_ytdl_player(yt_url)
+                except Exception:
+                    await client.send_message(message.server, "Bad url")
+                else:
                     players[message.server.id] = player
-                    player.start()
-                except Exception as e:
-                    await client.send_message(message.server, "Error: [{error}]".format(error=e))
+                    players[message.server.id].start()
+                    await client.send_message(message.channel, '<@'+str(message.author.id)+'> lance le son !')
+
 
             if not client.is_voice_connected(message.server):
                 await client.send_message(message.channel, '<@'+str(message.author.id)+'>, fais "!join" pour m\'appeler !')
@@ -273,24 +409,51 @@ async def on_message(message):
 
 
     if msg.startswith('!stop'):
-        try :
-            if players[message.server.id].is_playing() :
-                players[message.server.id].stop()
-        except Exception as ee:
-            await client.send_message(message.server, "Error: [{error}]".format(error=ee))
+        nextPaused[0] = False
+
+        if message.server.id in players:
+            players[message.server.id].stop()
 
 
     if msg.startswith('!pause'):
-        try:
+        nextPaused[0] = True
+        if message.server.id in players:
             players[message.server.id].pause()
-        except Exception as error:
-            await client.send_message(message.channel, "Error: [{error}]".format(error=error))
 
     if msg.startswith('!resume'):
-        try:
+        nextPaused[0] = False
+        if message.server.id in players:
             players[message.server.id].resume()
-        except Exception as error:
-            await client.send_message(message.channel, "Error: [{error}]".format(error=error))
+
+
+    if msg.startswith('!now'):
+        if message.server.id in players:
+            if players[message.server.id].is_playing():
+                await client.send_message(message.channel, "*Now playing :* " + players[message.server.id].title)
+
+
+    if msg.startswith('!next '):
+        nextSong.append(message.content[6:])
+        nextPosition = (len(nextSong))
+        if message.server.id in players:
+            if players[message.server.id].is_playing():
+                client.loop.create_task(timerNext(message, nextPosition))
+
+            else:
+                await client.send_message(message.channel, 'Use "!play *url*" before, please.')
+        else:
+            await client.send_message(message.channel, 'Use "!play *url*" before, please.')
+
+
+    if msg.startswith('!show'):
+        if len(nextSong) > 0:
+            await client.send_message(message.channel, 'Coming up next :')
+            for i in range(len(nextSong)):
+                await client.send_message(message.channel, '**'+str(i+1)+' -> **' + nextSong[i])
+        else:
+            await client.send_message(message.channel, 'No next song.')
+
+
 
 
 
@@ -320,6 +483,28 @@ async def on_message(message):
             await client.send_message(message.channel, "https://giphy.com/gifs/hLVK6yBZcyPVm")
         else:
             await client.send_message(message.channel, "Comme disait mon père : on s'en bat les cou*lles, frère.")
+
+
+
+
+
+async def timerNext(message, nextPosition):
+    while nextPosition != 0:
+        await asyncio.sleep(10)
+        while players[message.server.id].is_playing() or nextPaused[0] == True:
+            await asyncio.sleep(1)
+        nextPosition -= 1
+
+    #await client.send_message(message.channel, 'Chargement...')
+    voice = client.voice_client_in(message.server)
+    nextNext = nextSong.pop(0)
+    try:
+        player = await voice.create_ytdl_player(nextNext)
+    except Exception:
+        await client.send_message(message.server, "Bad url")
+    else:
+        players[message.server.id] = player
+        players[message.server.id].start()
 
 
 
@@ -365,7 +550,7 @@ async def timer():
 
 
 
-client.loop.create_task(timer())
+
 
 
 client.run('MzQ4MTUzOTU1MTEwNjE3MDg4.DHizMw.lztjQN51KNLu4Zqi8McYC_9cQVo')
