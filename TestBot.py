@@ -22,7 +22,7 @@ import opuslib.api.decoder
 
 
 
-#discord.opus.load_opus('libopus.so')
+discord.opus.load_opus('libopus.so')
 
 
 des = 'Le meilleur des bots de test dans ton jardin'
@@ -514,38 +514,39 @@ async def timer():
         await asyncio.sleep(60)
         #tt = datetime.datetime.now().time()
         #print(tt)
-        rand = random.randint(1, 500)
+        rand = random.randint(1, 1000)
         if rand == 1:
             l1 =list(client.servers)
-            l2 =list(l1[0].channels)
-            x=0
-            while str(l2[x].type) != 'text':
-                x+=1
+            for e in l1:
+                l2 =list(e.channels)
+                x=0
+                while str(l2[x].type) != 'text':
+                    x+=1
 
-            rand2 = random.randint(1, 10)
-            if rand2 == 1:
-                await client.send_message(l2[x], 'run random_text.exe')
-            elif rand2 == 2:
-                await client.send_message(l2[x], "SPAAAAAAAAAAAAAAACE")
-            elif rand2 == 3:
-                await client.send_message(l2[x], "ping :3")
-            elif rand2 == 4:
-                await client.send_message(l2[x], "C'est fou la façon dont les gens peuvent changer rapidement. Un jour on est important et le lendemain plus rien")
-            elif rand2 == 5:
-                await client.send_message(l2[x], "La vie est trop timide, elle n'ose pas me sourire.")
-            elif rand2 == 6:
-                await client.send_message(l2[x], "L'intelligence artificielle se définit comme le contraire de la bêtise naturelle.")
-                await client.send_message(l2[x], "-Woody Allen-")
-            elif rand2 == 7:
-                await client.send_message(l2[x], "@#&µ%$ !, j'ai fait surchauffer mon hamster...")
-            elif rand2 == 8:
-                await client.send_message(l2[x], "Perso, je m'ennuie de ouf.")
-            elif rand2 == 9:
-                await client.send_message(l2[x], "I'm a bot.")
-                await asyncio.sleep(10)
-                await client.send_message(l2[x], "Or am I?")
-            else:
-                await client.send_message(l2[x], "It's-a Me, Mario!")
+                rand2 = random.randint(1, 10)
+                if rand2 == 1:
+                    await client.send_message(l2[x], 'run random_text.exe')
+                elif rand2 == 2:
+                    await client.send_message(l2[x], "SPAAAAAAAAAAAAAAACE")
+                elif rand2 == 3:
+                    await client.send_message(l2[x], "ping :3")
+                elif rand2 == 4:
+                    await client.send_message(l2[x], "C'est fou la façon dont les gens peuvent changer rapidement. Un jour on est important et le lendemain plus rien")
+                elif rand2 == 5:
+                    await client.send_message(l2[x], "La vie est trop timide, elle n'ose pas me sourire.")
+                elif rand2 == 6:
+                    await client.send_message(l2[x], "L'intelligence artificielle se définit comme le contraire de la bêtise naturelle.")
+                    await client.send_message(l2[x], "-Woody Allen-")
+                elif rand2 == 7:
+                    await client.send_message(l2[x], "@#&µ%$ !, j'ai fait surchauffer mon hamster...")
+                elif rand2 == 8:
+                    await client.send_message(l2[x], "Perso, je m'ennuie de ouf.")
+                elif rand2 == 9:
+                    await client.send_message(l2[x], "I'm a bot.")
+                    await asyncio.sleep(10)
+                    await client.send_message(l2[x], "Or am I?")
+                else:
+                    await client.send_message(l2[x], "It's-a Me, Mario!")
 
 
 
