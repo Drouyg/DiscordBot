@@ -310,7 +310,7 @@ async def on_message(message):
             await client.send_message(message.channel, '*<@'+str(message.author.id)+'> open the jukebox.*')
             await client.send_message(message.channel, 'https://giphy.com/gifs/ruby-XxkkxrnylVG7u')
             for i in range(len(jukebox)):
-                await client.send_message(message.channel, '**-----------'+str(i+1)+'-----------*\n'
+                await client.send_message(message.channel, '**-----------'+str(i+1)+'-----------**\n'
                 + '**Name : ' + jukebox[i][0] + '**\n'
                 + '*Id : ' + jukebox[i][1] + '*\n'
                 + '*Nb of song : ' + str(len(jukebox[i])-2) + '*\n'
