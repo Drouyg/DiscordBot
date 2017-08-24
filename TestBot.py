@@ -22,7 +22,7 @@ import opuslib.api.decoder
 
 
 
-discord.opus.load_opus('libopus.so')
+#discord.opus.load_opus('libopus.so')
 
 
 des = 'Le meilleur des bots de test dans ton jardin'
@@ -310,11 +310,11 @@ async def on_message(message):
             await client.send_message(message.channel, '*<@'+str(message.author.id)+'> open the jukebox.*')
             await client.send_message(message.channel, 'https://giphy.com/gifs/ruby-XxkkxrnylVG7u')
             for i in range(len(jukebox)):
-                await client.send_message(message.channel, '**-----------'+str(i+1)+'-----------**')
-                await client.send_message(message.channel, '**Name : ' + jukebox[i][0] + '**')
-                await client.send_message(message.channel, '*Id : ' + jukebox[i][1] + '*')
-                await client.send_message(message.channel, '*Nb of song : ' + str(len(jukebox[i])-2) + '*')
-                await client.send_message(message.channel, '**------------------------**')
+                await client.send_message(message.channel, '**-----------'+str(i+1)+'-----------*\n'
+                + '**Name : ' + jukebox[i][0] + '**\n'
+                + '*Id : ' + jukebox[i][1] + '*\n'
+                + '*Nb of song : ' + str(len(jukebox[i])-2) + '*\n'
+                + '**------------------------**\n')
             await client.send_message(message.channel, 'Use "!jukebox *id*" to place a disk.')
 
         else:
@@ -334,18 +334,18 @@ async def on_message(message):
 
 
     if msg.startswith('!help'):
-        await client.send_message(message.channel, 'Besoin d\'aide ? C\'est simple, c\'est du Franglais !')
-        await client.send_message(message.channel, '**"!join"** - Dans ton salon vocal, le bot se joindra.')
-        await client.send_message(message.channel, '**"!quit"** - Dans l\'espace, le bot repartira.')
-        await client.send_message(message.channel, '**"!play *url*"** - La vidéo youtube, le bot lira.')
-        await client.send_message(message.channel, '**"!stop"** - La vidéo youtube, le bot arrêtera. À la suivante, il passera.')
-        await client.send_message(message.channel, '**"!pause"** - La vidéo youtube, le bot mettra en pause.')
-        await client.send_message(message.channel, '**"!resume"** - La vidéo youtube, le bot reprendra.')
-        await client.send_message(message.channel, '**"!now"** - Le titre de la vidéo youtube, le bot affichera.')
-        await client.send_message(message.channel, '**"!next *url*"** - La vidéo youtube à la liste de lecture, le bot ajoutera.')
-        await client.send_message(message.channel, '**"!show"** - Les prochaines vidéos youtube dans la liste de lecture, le bot affichera.')
-        await client.send_message(message.channel, '**"!jukebox"** - une liste de vidéos présélectionnées, le bot affichera.')
-        await client.send_message(message.channel, '**"!jukebox *id*"** - une liste de vidéos présélectionnées, le bot lancera.')
+        await client.send_message(message.channel, 'Besoin d\'aide ? C\'est simple, c\'est du Franglais !\n'
+        +'**"!join"** - Dans ton salon vocal, le bot se joindra.\n'
+        +'**"!quit"** - Dans l\'espace, le bot repartira.\n'
+        +'**"!play *url*"** - La vidéo youtube, le bot lira.\n'
+        +'**"!stop"** - La vidéo youtube, le bot arrêtera. À la suivante, il passera.\n'
+        +'**"!pause"** - La vidéo youtube, le bot mettra en pause.\n'
+        +'**"!resume"** - La vidéo youtube, le bot reprendra.\n'
+        +'**"!now"** - Le titre de la vidéo youtube, le bot affichera.\n'
+        +'**"!next *url*"** - La vidéo youtube à la liste de lecture, le bot ajoutera.\n'
+        +'**"!show"** - Les prochaines vidéos youtube dans la liste de lecture, le bot affichera.\n'
+        +'**"!jukebox"** - une liste de vidéos présélectionnées, le bot affichera.\n'
+        +'**"!jukebox *id*"** - une liste de vidéos présélectionnées, le bot lancera.\n')
 
 
 
