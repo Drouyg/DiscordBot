@@ -20,12 +20,10 @@ import opuslib.api.encoder
 import opuslib.api.decoder
 """
 
-
-
 discord.opus.load_opus('libopus.so')
 
 
-des = 'Le meilleur des bots de test dans ton jardin'
+des = 'Le meilleur des bots de JDR et de musique dans ton jardin'
 
 prefix = ''
 
@@ -187,10 +185,6 @@ jukebox = [
 
 
 
-
-
-
-
 def randomTalk(message, word, textList):
     if word in message.content.lower():
         rand = random.randint(1,len(textList))
@@ -202,37 +196,152 @@ def randomTalk(message, word, textList):
 
 
 
+
+#FONCTION ROLL
+
+
+def RandomBetween(x,y):
+    randl = []
+    for i in range(x,y+1):
+        randl.append(i)
+    random.shuffle(randl)
+    return randl[0]
+
+
+def IsANumber(c):
+    return True if (48 <= ord(c) <= 57) else False
+
+def RollToList(text, rollList):
+    #print(rollList, '.'+text)
+    if text[0] == ' ':
+        if len(text) == 1:
+            return rollList
+        else:
+            return RollToList(text[1:], rollList)
+    elif IsANumber(text[0]):
+        i = 0
+        nb = ''
+        while True:
+            if len(text) == i:
+                rollList.append(nb)
+                return rollList
+            if IsANumber(text[i]):
+                nb += text[i]
+            elif text[i] == 'd':
+                if len(text) == i+1:
+                    return 1
+                elif not IsANumber(text[i+1]):
+                    return 1
+                else:
+                    nb += 'd'
+                    i+=1
+                    while True:
+                        if len(text) == i:
+                            rollList.append(nb)
+                            return rollList
+                        if IsANumber(text[i]):
+                            nb += text[i]
+                        else:
+                            rollList.append(nb)
+                            return RollToList(text[i:], rollList)
+                        i+=1
+            else:
+                rollList.append(nb)
+                return RollToList(text[i:], rollList)
+            i+=1
+    elif text[0] == '(' or text[0] == ')' or text[0] == '+' or text[0] == '-' or text[0] == '*' or text[0] == '/':
+        rollList.append(text[0])
+        if len(text) == 1:
+            return rollList
+        else:
+            return RollToList(text[1:], rollList)
+    else:
+        return 1
+
+
+
+def RollAnalyse(rList):
+    prevIsNb = False
+    nbParenthesis = 0
+    for i in range(len(rList)):
+        if rList[i].isdigit() or 'd' in rList[i]:
+            if prevIsNb:
+                return 1
+            prevIsNb = True
+        elif rList[i] == '+' or rList[i] == '-' or rList[i] == '*' or rList[i] == '/':
+            if not prevIsNb or i+1 == len(rList):
+                return 1
+            prevIsNb = False
+        elif rList[i] == '(':
+            if prevIsNb:
+                return 1
+            prevIsNb = False
+            nbParenthesis += 1
+        elif rList[i] == ')':
+            if not prevIsNb:
+                return 1
+            prevIsNb = True
+            nbParenthesis -= 1
+            if nbParenthesis < 0:
+                return 1
+
+
+    if nbParenthesis != 0:
+        return 1
+
+    return 0
+
+
+
+
+def Roll(text):
+    rollList = []
+    rollList = RollToList(text, rollList)
+    if rollList == 1:
+        return 'Bad syntax.', 'error'
+
+    if RollAnalyse(rollList) == 1:
+        return 'Bad formula.', 'error'
+
+    rollRes = ''
+    rollMsg = ''
+
+    for e in rollList:
+        if 'd' in e:
+            index = e.index('d')
+            rollRes += '('
+            rollMsg += '('
+            for i in range(int(e[:index])):
+                rand = RandomBetween(1, int(e[index+1:]))
+                rollRes += str(rand) +'+'
+                rollMsg += " **|" + str(rand) +"|** :game_die:*" + e[index+1:] + '* +'
+            rollRes = rollRes[:-1]
+            rollMsg = rollMsg[:-1]
+            rollRes += ')'
+            rollMsg += ')'
+        else:
+            rollRes += e
+            if e == '*':
+                rollMsg += '\\*'
+            else:
+                rollMsg += e
+
+    return rollMsg, str(eval(rollRes))
+
+
+
+
+
+
+
+
+
+
+
 @client.event
 async def on_ready():
-    print('It works')
+    print('Hello again, world.')
     client.loop.create_task(timer())
-
-
-"""
-
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
-
-    if message.content.startswith('greet'):
-        await client.send_message(message.channel, 'Say hello!')
-
-
-
-@client.command(pass_context=True)
-async def ping(ctx):
-    await client.say('pong')
-
-@client.command(pass_context=True)
-async def Ping(ctx):
-    await client.say('pong')
-
-@client.command(pass_context=True)
-async def slap(ctx,args):
-    await client.say('You slapped {}'.format(args))
-
-"""
 
 
 
@@ -244,69 +353,98 @@ async def on_message(message):
     msg = message.content.lower()
 
 
-    if msg.startswith('ping'):
-        rand = random.randint(1,100)
-        if rand == 1:
-            await client.send_message(message.channel, 'pouet')
-            await asyncio.sleep(10)
-            await client.send_message(message.channel, 'Oui, "pouet", j\'assume.')
+    if msg.startswith('!ping'):
+        await client.send_message(message.channel, 'pong')
+
+
+
+
+
+    if msg.startswith('!r'):
+        if len(msg)<3:
+            await client.send_message(message.channel, 'Roll something !')
         else:
-            await client.send_message(message.channel, 'pong')
+            text = msg[2:]
+            retourMsg, retour = Roll(text)
+            if retour != 'error':
+                await client.send_message(message.channel, '<@' + str(
+                    message.author.id) + '> rolled :\n' + retourMsg + "\n\n**= " + retour + "**")
+            else:
+                await client.send_message(message.channel, '<@' + str(
+                    message.author.id) + '> Error : ' + retourMsg)
 
-    if msg.startswith('slap'):
-        if len(msg)<5:
-            await client.send_message(message.channel, 'Hey, <@'+str(message.author.id)+'>, I can slap who you want, just tell me.')
-        else:
-            await client.send_message(message.channel, '<@'+str(message.author.id)+'> slapped' + msg[4:])
 
 
 
-    if msg.startswith('quoi ?'):
-        rand = random.randint(1,5)
-        if rand == 1:
-            await client.send_message(message.channel, 'WHAAAAAAT ?')
-        elif rand == 2:
-            await client.send_message(message.channel, 'NANI ?!')
-        elif rand == 3:
-            await client.send_message(message.channel, 'Et pour le fromage ?')
-        elif rand == 4:
-            await client.send_message(message.channel, 'Comment ?')
-        else:
-            await client.send_message(message.channel, 'https://giphy.com/gifs/reaction-learning-charlottesville-pfAKetMYidBjq')
 
-    if msg.startswith('ah'):
-        rand = random.randint(1,3)
-        if rand == 1:
-            await client.send_message(message.channel, "https://giphy.com/gifs/geekinc-ah-geek-inc-3o7btW7VDxqrhJEnqE")
-        elif rand == 2:
-            await client.send_message(message.channel, 'Je dirais même plus: "AH" !')
-        else:
-            await client.send_message(message.channel, "https://giphy.com/gifs/nba-interesting-xUPGcmrdRkCaZ5qZ2M")
 
-    if 'temps' in msg:
-        today = datetime.date.today().isoweekday()
-        if today == 1:
-            await client.send_message(message.channel, 'On est lundi, et oui !')
-        elif today == 2:
-            await client.send_message(message.channel, 'Nous sommes mardi.')
-        elif today == 3:
-            await client.send_message(message.channel, "C'est mercredi !")
-        elif today == 4:
-            await client.send_message(message.channel, "On est jeudi aujourd'hui !")
-        elif today == 5:
-            await client.send_message(message.channel, "Le vendredi, c'est tout de suite !")
-        elif today == 6:
-            await client.send_message(message.channel, 'On est un samedi.')
-        else:
-            await client.send_message(message.channel, "Dimanche, le jour d'aujourd'hui est.")
+    if message.server.id == '348154317464928266':
+
+        if msg.startswith('ping'):
+            rand = random.randint(1,100)
+            if rand == 1:
+                await client.send_message(message.channel, 'pouet')
+                await asyncio.sleep(10)
+                await client.send_message(message.channel, 'Oui, "pouet", j\'assume.')
+            else:
+                await client.send_message(message.channel, 'pong')
+
+        if msg.startswith('slap'):
+            if len(msg)<5:
+                await client.send_message(message.channel, 'Hey, <@'+str(message.author.id)+'>, I can slap who you want, just tell me.')
+            else:
+                await client.send_message(message.channel, '<@'+str(message.author.id)+'> slapped' + msg[4:])
+
+
+
+        if msg.startswith('quoi ?'):
+            rand = random.randint(1,5)
+            if rand == 1:
+                await client.send_message(message.channel, 'WHAAAAAAT ?')
+            elif rand == 2:
+                await client.send_message(message.channel, 'NANI ?!')
+            elif rand == 3:
+                await client.send_message(message.channel, 'Et pour le fromage ?')
+            elif rand == 4:
+                await client.send_message(message.channel, 'Comment ?')
+            else:
+                await client.send_message(message.channel, 'https://giphy.com/gifs/reaction-learning-charlottesville-pfAKetMYidBjq')
+
+        if msg.startswith('ah'):
+            rand = random.randint(1,3)
+            if rand == 1:
+                await client.send_message(message.channel, "https://giphy.com/gifs/geekinc-ah-geek-inc-3o7btW7VDxqrhJEnqE")
+            elif rand == 2:
+                await client.send_message(message.channel, 'Je dirais même plus: "AH" !')
+            else:
+                await client.send_message(message.channel, "https://giphy.com/gifs/nba-interesting-xUPGcmrdRkCaZ5qZ2M")
+
+        if 'temps' in msg:
+            today = datetime.date.today().isoweekday()
+            if today == 1:
+                await client.send_message(message.channel, 'On est lundi, et oui !')
+            elif today == 2:
+                await client.send_message(message.channel, 'Nous sommes mardi.')
+            elif today == 3:
+                await client.send_message(message.channel, "C'est mercredi !")
+            elif today == 4:
+                await client.send_message(message.channel, "On est jeudi aujourd'hui !")
+            elif today == 5:
+                await client.send_message(message.channel, "Le vendredi, c'est tout de suite !")
+            elif today == 6:
+                await client.send_message(message.channel, 'On est un samedi.')
+            else:
+                await client.send_message(message.channel, "Dimanche, le jour d'aujourd'hui est.")
 
 
 
     #JUKEBOX
 
+    #if message.server.id == '348154317464928266':
 
     if msg.startswith('!jukebox'):
         if len(msg)<9:
+            await client.delete_message(message)
             await client.send_message(message.channel, '*<@'+str(message.author.id)+'> open the jukebox.*')
             await client.send_message(message.channel, 'https://giphy.com/gifs/ruby-XxkkxrnylVG7u')
             for i in range(len(jukebox)):
@@ -320,10 +458,17 @@ async def on_message(message):
         else:
             for e in jukebox:
                 if msg[9:] == e[1]:
+                    await client.delete_message(message)
                     await client.send_message(message.channel, "!play " + e[2])
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(10)
                     for i in range(3, len(e)):
-                        await client.send_message(message.channel, "!next " + e[i])
+                        nextSong.append(e[i])
+                        nextPosition = (len(nextSong))
+                        if message.server.id in players:
+                            client.loop.create_task(timerNext(message, nextPosition))
+
+                        #await client.send_message(message.channel, "!next " + e[i])
+                        await asyncio.sleep(2)
 
 
 
@@ -331,7 +476,7 @@ async def on_message(message):
 
     #MUSIC BOT
 
-
+    #if message.server.id == '348154317464928266':
 
     if msg.startswith('!help'):
         await client.send_message(message.channel, 'Besoin d\'aide ? C\'est simple, c\'est du Franglais !\n'
@@ -350,6 +495,7 @@ async def on_message(message):
 
 
     if msg.startswith('!join'):
+        await client.delete_message(message)
 
         if message.author.voice.voice_channel != None:
             if client.is_voice_connected(message.server):
@@ -366,6 +512,7 @@ async def on_message(message):
 
 
     if msg.startswith('!quit'):
+        await client.delete_message(message)
         nextPaused[0] = False
         nextSong.clear()
         if client.is_voice_connected(message.server):
@@ -399,6 +546,7 @@ async def on_message(message):
                 else:
                     players[message.server.id] = player
                     players[message.server.id].start()
+                    await client.delete_message(message)
                     await client.send_message(message.channel, '<@'+str(message.author.id)+'> lance le son !')
 
 
@@ -437,6 +585,7 @@ async def on_message(message):
         nextPosition = (len(nextSong))
         if message.server.id in players:
             if players[message.server.id].is_playing():
+                await client.delete_message(message)
                 client.loop.create_task(timerNext(message, nextPosition))
 
             else:
@@ -463,26 +612,27 @@ async def on_message(message):
 
 
     #RandomTalk
-    for e in randomTalkList:
-        word = e[0]
-        textList = e[1:]
-        retour = randomTalk(message, word, textList)
-        if retour !=0 :
-            await client.send_message(message.channel, retour)
+
+    if message.server.id == '348154317464928266':
+
+        for e in randomTalkList:
+            word = e[0]
+            textList = e[1:]
+            retour = randomTalk(message, word, textList)
+            if retour !=0 :
+                await client.send_message(message.channel, retour)
 
 
-
-
-    if random.randint(1, 50) == 1:
-        rand = random.randint(1, 4)
-        if rand == 1:
-            await client.send_message(message.channel, 'Yeah, Whatever.')
-        elif rand == 2:
-            await client.send_message(message.channel, "Qui s'en fout ? \o/")
-        elif rand == 3:
-            await client.send_message(message.channel, "https://giphy.com/gifs/hLVK6yBZcyPVm")
-        else:
-            await client.send_message(message.channel, "Comme disait mon père : on s'en bat les cou*lles, frère.")
+        if random.randint(1, 50) == 1:
+            rand = random.randint(1, 4)
+            if rand == 1:
+                await client.send_message(message.channel, 'Yeah, Whatever.')
+            elif rand == 2:
+                await client.send_message(message.channel, "Qui s'en fout ? \o/")
+            elif rand == 3:
+                await client.send_message(message.channel, "https://giphy.com/gifs/hLVK6yBZcyPVm")
+            else:
+                await client.send_message(message.channel, "Comme disait mon père : on s'en bat les cou*lles, frère.")
 
 
 
@@ -518,40 +668,65 @@ async def timer():
         if rand == 1:
             l1 =list(client.servers)
             for e in l1:
-                l2 =list(e.channels)
-                x=0
-                while str(l2[x].type) != 'text':
-                    x+=1
+                if e.id == '348154317464928266':
+                    l2 =list(e.channels)
+                    x=0
+                    while str(l2[x].type) != 'text':
+                        x+=1
 
-                rand2 = random.randint(1, 10)
-                if rand2 == 1:
-                    await client.send_message(l2[x], 'run random_text.exe')
-                elif rand2 == 2:
-                    await client.send_message(l2[x], "SPAAAAAAAAAAAAAAACE")
-                elif rand2 == 3:
-                    await client.send_message(l2[x], "ping :3")
-                elif rand2 == 4:
-                    await client.send_message(l2[x], "C'est fou la façon dont les gens peuvent changer rapidement. Un jour on est important et le lendemain plus rien")
-                elif rand2 == 5:
-                    await client.send_message(l2[x], "La vie est trop timide, elle n'ose pas me sourire.")
-                elif rand2 == 6:
-                    await client.send_message(l2[x], "L'intelligence artificielle se définit comme le contraire de la bêtise naturelle.")
-                    await client.send_message(l2[x], "-Woody Allen-")
-                elif rand2 == 7:
-                    await client.send_message(l2[x], "@#&µ%$ !, j'ai fait surchauffer mon hamster...")
-                elif rand2 == 8:
-                    await client.send_message(l2[x], "Perso, je m'ennuie de ouf.")
-                elif rand2 == 9:
-                    await client.send_message(l2[x], "I'm a bot.")
-                    await asyncio.sleep(10)
-                    await client.send_message(l2[x], "Or am I?")
-                else:
-                    await client.send_message(l2[x], "It's-a Me, Mario!")
-
-
-
+                    rand2 = random.randint(1, 10)
+                    if rand2 == 1:
+                        await client.send_message(l2[x], 'run random_text.exe')
+                    elif rand2 == 2:
+                        await client.send_message(l2[x], "SPAAAAAAAAAAAAAAACE")
+                    elif rand2 == 3:
+                        await client.send_message(l2[x], "ping :3")
+                    elif rand2 == 4:
+                        await client.send_message(l2[x], "C'est fou la façon dont les gens peuvent changer rapidement. Un jour on est important et le lendemain plus rien")
+                    elif rand2 == 5:
+                        await client.send_message(l2[x], "La vie est trop timide, elle n'ose pas me sourire.")
+                    elif rand2 == 6:
+                        await client.send_message(l2[x], "L'intelligence artificielle se définit comme le contraire de la bêtise naturelle.")
+                        await client.send_message(l2[x], "-Woody Allen-")
+                    elif rand2 == 7:
+                        await client.send_message(l2[x], "@#&µ%$ !, j'ai fait surchauffer mon hamster...")
+                    elif rand2 == 8:
+                        await client.send_message(l2[x], "Perso, je m'ennuie de ouf.")
+                    elif rand2 == 9:
+                        await client.send_message(l2[x], "I'm a bot.")
+                        await asyncio.sleep(10)
+                        await client.send_message(l2[x], "Or am I?")
+                    else:
+                        await client.send_message(l2[x], "It's-a Me, Mario!")
 
 
+        if datetime.date.today().isoweekday() == 7 and datetime.datetime.now().hour == 9 and datetime.datetime.now().minute == 0:
+            l1 =list(client.servers)
+            for e in l1:
+                if e.id == '228982241609515008':
+                    l2 =list(e.channels)
+                    x=0
+                    while str(l2[x].id) == '231128267485085706':
+                        x+=1
+
+                    rand = random.randint(1, 5)
+                    if rand == 1:
+                        await client.send_message(l2[x], '@everyone On est dimanche, balancez les dispos de la semaine !')
+                    elif rand == 2:
+                        await client.send_message(l2[x], "@everyone Soon une session de JDR ? Balancez les dispos de la semaine !")
+                    elif rand == 3:
+                        await client.send_message(l2[x], "@everyone C'est l'heure d'organiser la prochaine session ! Balancez les dispos de la semaine !")
+                    elif rand == 4:
+                        await client.send_message(l2[x], "@everyone Le dimanche, c'est l'organisation du JDR. Balancez les dispos de la semaine !")
+                    else:
+                        await client.send_message(l2[x], "@everyone Dimanche ! Balancez les dispos de la semaine ! :heart: ")
 
 
-client.run('MzQ4MTUzOTU1MTEwNjE3MDg4.DHizMw.lztjQN51KNLu4Zqi8McYC_9cQVo')
+
+
+
+
+
+
+
+client.run('MzYxMTQ2NDYwMTkzOTQ3NjUx.DKf3YA.FqKsYgE1hhGpZXkDJuUpYKFngMo')
