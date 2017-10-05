@@ -23,6 +23,7 @@ import opuslib.api.decoder
 discord.opus.load_opus('libopus.so')
 
 
+
 des = 'Le meilleur des bots de JDR et de musique dans ton jardin'
 
 prefix = ''
