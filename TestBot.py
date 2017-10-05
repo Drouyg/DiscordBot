@@ -730,4 +730,4 @@ async def timer():
 
 
 
-client.run('MzYxMTQ2NDYwMTkzOTQ3NjUx.DLfv1Q.rdRYr58lITVQiS8jKEHoEoh3KPE')
+client.run('MzYxMTQ2NDYwMTkzOTQ3NjUx.DLgGMA.QGx-c_SacjH0fkeyhDqazOzlR3s')
